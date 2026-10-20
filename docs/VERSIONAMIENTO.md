@@ -61,7 +61,7 @@ Cada pull request debe indicar su rama de origen y destino, comportamiento resul
 
 - Rama de trabajo actual: `feature/vimo-scaffold`; destino: `develop`.
 - Ramas permanentes locales: `main` (antes `master`) y `develop`.
-- No hay remoto configurado. La publicación de ramas y la protección remota quedan pendientes hasta disponer del repositorio remoto.
+- Remoto `origin`: `https://github.com/shynzx/VimoFrontend.git` (repositorio privado). La protección de ramas se configura por separado en GitHub.
 - Versión base de desarrollo: `0.1.0`, todavía sin etiqueta de publicación local.
 - Sincronizar `package.json`, `package-lock.json` (raíz y `packages[""]`), `app.json` (`expo.version`), `server/package.json` y `server/package-lock.json` (raíz y `packages[""]`) al preparar una versión.
 - Validaciones: `npm run lint`, `npm run typecheck`, `npm test` y `npm run server:test`. Ejecutar también la prueba PostgreSQL en CI y validar Android/iOS para cambios móviles antes de una liberación.

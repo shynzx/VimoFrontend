@@ -38,8 +38,8 @@ exports.loadClient = function ({ fetch = async () => { throw new Error('sin red'
     return module.exports;
   }
   return {
-    api: load('src/services/ApiService.ts').ApiService.getInstance(),
-    cache: load('src/services/CacheService.ts').CacheService.getInstance(),
+    api: load('src/services/ServicioApi.ts').ServicioApi.obtenerInstancia(),
+    cache: load('src/services/ServicioCache.ts').ServicioCache.obtenerInstancia(),
     storage, clock,
   };
 };

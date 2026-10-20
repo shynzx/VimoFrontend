@@ -1,2 +1,2 @@
-export { CardModel } from './CardModel';
-export { GuideModel } from './GuideModel';
+export { ModeloCarta } from './ModeloCarta';
+export { ModeloGuia } from './ModeloGuia';

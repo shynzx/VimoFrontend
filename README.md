@@ -29,7 +29,7 @@ Copy-Item .env.example .env
    dotnet run --launch-profile http
    ```
 
-   El estado de la API está en `http://localhost:3000/health`.
+   El estado de la API está en `http://localhost:3000/salud`.
 
 2. En este repositorio:
 
@@ -37,7 +37,7 @@ Copy-Item .env.example .env
    npm start
    ```
 
-   Para la versión web, `npm run web` (puerto 8081). En desarrollo el backend permite CORS desde `http://localhost:8081` (`Vimo:WebOrigin`).
+   Para la versión web, `npm run web` (puerto 8081). En desarrollo el backend permite CORS desde `http://localhost:8081` (`Vimo:OrigenWeb`).
 
 En un dispositivo físico, reemplazar `localhost` por la IP LAN del equipo en `.env`, y lanzar la API escuchando en esa interfaz (por ejemplo `dotnet run --launch-profile http --urls http://0.0.0.0:3000`). En el emulador Android estándar, el equipo anfitrión suele ser accesible en `10.0.2.2`. Reiniciar Expo después de modificar `.env`.
 
@@ -51,20 +51,20 @@ npm run typecheck
 npm test
 ```
 
-Las pruebas ejecutan los servicios reales del cliente (`ApiService`, `CacheService`) con red y almacenamiento simulados. El flujo `.github/workflows/checks.yml` ejecuta las mismas verificaciones en GitHub Actions. Las pruebas de la API viven en VimoBackend.
+Las pruebas ejecutan los servicios reales del cliente (`ServicioApi`, `ServicioCache`) con red y almacenamiento simulados. El flujo `.github/workflows/checks.yml` ejecuta las mismas verificaciones en GitHub Actions. Las pruebas de la API viven en VimoBackend.
 
 ## Organización y arquitectura
 
 Recorrido principal: **portada → Centro táctico → Base de datos de cartas** (código de cuatro dígitos con teclado numérico, por ejemplo `0013`) **→ detalle de la carta**. El **Archivo de lore** lista personajes, enemigos y lugares, y abre su perfil con enlaces a las cartas relacionadas. Ver los [recorridos de usuario](docs/RECORRIDOS_USUARIO.md).
 
-- `src/app/`: rutas de Expo Router. `index.tsx` es la portada; `(tabs)/` contiene las pestañas Inicio, Cartas y Lore, con pilas propias para los detalles.
+- `src/app/`: rutas de Expo Router, en español. `index.tsx` es la portada (`/`); `(tabs)/` contiene las pestañas `/inicio`, `/cartas` (detalle en `/cartas/CAR-013`) y `/guia` (perfil en `/guia/personajes/eco-7`, `/guia/enemigos/…` o `/guia/infraestructura/…`).
 - `src/views/`: pantallas y presentación.
 - `src/controllers/`: coordinación de consultas del cliente.
-- `src/models/`: validación y representación de entidades (`LoreEntry` unifica la presentación del archivo de lore).
+- `src/models/`: validación y representación de entidades (`EntradaLore` unifica la presentación del archivo de lore).
 - `src/services/`: API, caché en memoria y almacenamiento persistente.
 - `src/components/` y `src/theme/`: componentes y sistema visual compartidos.
 
-El cliente consume el contrato `{ success, data, pagination?, meta }` ([contrato de API](docs/API_CONTRACT.md)), descarga todas las páginas del catálogo de cartas y busca localmente por código (`0013` o `CAR-013`) o por nombre, categoría y efecto, sin distinguir mayúsculas ni acentos.
+El cliente consume el contrato en español `{ exito, datos, paginacion?, meta }` ([contrato de API](docs/API_CONTRACT.md)), descarga todas las páginas del catálogo de cartas y busca localmente por código (`0013` o `CAR-013`) o por nombre, categoría y efecto, sin distinguir mayúsculas ni acentos.
 
 La caché mantiene cuatro catálogos por servidor, caduca a los cinco minutos y conserva la última respuesta válida ante fallos de red. Las solicitudes simultáneas al mismo catálogo se deduplican. El almacenamiento está limitado a 24 entradas y 2 MiB estimados por entrada; las entradas mayores solo permanecen en memoria. Las versiones previas de la caché se ignoran mediante un prefijo versionado.
 

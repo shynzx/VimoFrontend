@@ -1,2 +1,2 @@
-export { CardsController } from './CardsController';
-export { GuideController } from './GuideController';
+export { ControladorCartas } from './ControladorCartas';
+export { ControladorGuia } from './ControladorGuia';

@@ -1,5 +1,5 @@
-import { WelcomeScreen } from '../views/WelcomeScreen';
+import { PantallaBienvenida } from '../views/PantallaBienvenida';
 
-export default function WelcomeRoute() {
-  return <WelcomeScreen />;
+export default function RutaBienvenida() {
+  return <PantallaBienvenida />;
 }

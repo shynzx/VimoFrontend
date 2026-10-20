@@ -20,7 +20,7 @@ VIMO solo consulta información: no modifica la partida.
 
 El código se deriva del ID de diseño de la carta: `CAR-013` corresponde a `0013`. La búsqueda del cliente y de la API también acepta el ID completo (`CAR-013`, sin distinguir mayúsculas). Los códigos incompletos no se interpretan como coincidencias parciales: `013` no encuentra `0013`. Si el código no existe, la pantalla indica que no hay ninguna carta con ese código y permanece en la consulta.
 
-`id` conserva el ID de diseño, que usan los detalles y las relaciones; `gameId` guarda el código de cuatro dígitos como texto para preservar los ceros iniciales. La caché preserva ambos valores.
+`id` conserva el ID de diseño, que usan los detalles y las relaciones; `codigoJuego` guarda el código de cuatro dígitos como texto para preservar los ceros iniciales. La caché preserva ambos valores.
 
 Los códigos válidos son `0001` a `0021`, uno por cada carta del catálogo del GDD.
 

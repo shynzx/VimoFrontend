@@ -24,7 +24,7 @@ const theme = {
   },
 };
 
-export default function RootLayout() {
+export default function DisenoRaiz() {
   const [loaded, error] = useFonts({
     Rajdhani_600SemiBold, Rajdhani_700Bold,
     Inter_400Regular, Inter_500Medium, Inter_600SemiBold,

@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { loadClient } = require('./load-client.cjs');
 
-const card = { id: 'c1', name: 'Pulsación', type: 'Ataque', cost: 1, effect: 'Daño', description: 'Ataque de energía', tags: ['rápido'] };
+const card = { id: 'c1', name: 'Pulsación', category: 'Combate', effect: 'Daño rápido de energía', availability: 'Tienda y UI', maxLevel: 4 };
 const body = (data, page = 1, totalPages = 1, demo = false) => ({ success: true, data, pagination: { page, totalPages }, meta: { demo } });
 const response = (json) => ({ ok: true, json: async () => json });
 
@@ -18,7 +18,7 @@ test('lee el contrato paginado completo, normaliza acentos y reutiliza la caché
   assert.equal(result.source, 'network');
   assert.equal((await api.searchCards('  PULSACION  ')).data.length, 2);
   assert.equal((await api.searchCards('rapido')).data.length, 2);
-  assert.equal((await api.searchCards('ataque')).data.length, 2);
+  assert.equal((await api.searchCards('combate')).data.length, 2);
   assert.equal((await api.searchCards('inexistente')).data.length, 0);
   assert.equal(calls.length, 2);
 });
@@ -72,10 +72,10 @@ test('separa la caché por servidor y mantiene la etiqueta demo al trabajar sin 
 test('la caché limita entradas sin borrar almacenamiento ajeno y descarta datos corruptos', async () => {
   const { cache, storage } = loadClient();
   storage.set('preferencias', 'conservar');
-  storage.set('@vimo_cache:v2:corrupto', '{');
+  storage.set('@vimo_cache:v3:corrupto', '{');
   assert.equal(await cache.get('corrupto'), null);
   for (let i = 0; i < 30; i++) await cache.set('key-' + i, { i });
-  assert.equal([...storage.keys()].filter((key) => key.startsWith('@vimo_cache:v2:')).length, 24);
+  assert.equal([...storage.keys()].filter((key) => key.startsWith('@vimo_cache:v3:')).length, 24);
   await cache.clear();
   assert.equal(storage.get('preferencias'), 'conservar');
 });
@@ -92,7 +92,7 @@ test('busca el ID de cuatro dígitos exactamente y conserva ceros iniciales entr
   const storage = new Map();
   const { api } = loadClient({ storage, fetch: async () => response(body([
     { ...card, gameId: '0001' },
-    { ...card, id: 'c2', gameId: '1001', description: 'Menciona 0001 en su texto' },
+    { ...card, id: 'c2', gameId: '1001', effect: 'Menciona 0001 en su texto' },
   ])) });
   assert.equal((await api.searchCards('0001')).data.length, 1);
   assert.equal((await api.searchCards('0001')).data[0].id, 'c1');
@@ -107,6 +107,22 @@ test('rechaza códigos inválidos y reconoce un ID interno de cuatro dígitos co
     const { api } = loadClient({ fetch: async () => response(body([{ ...card, gameId }])) });
     await assert.rejects(api.getCards());
   }
+  for (const maxLevel of [0, 1.5, '4']) {
+    const { api } = loadClient({ fetch: async () => response(body([{ ...card, maxLevel }])) });
+    await assert.rejects(api.getCards());
+  }
   const { api } = loadClient({ fetch: async () => response(body([{ ...card, id: '0042' }])) });
   assert.equal((await api.searchCards('0042')).data[0].gameId, '0042');
+});
+
+test('deriva el código de cuatro dígitos del ID del diseño y busca por ambos', async () => {
+  const { api } = loadClient({ fetch: async () => response(body([
+    { ...card, id: 'CAR-013', name: 'Gatillo optimizado' },
+    { ...card, id: 'CAR-014', gameId: '0014', name: 'Recarga táctica' },
+  ])) });
+  const cards = (await api.getCards()).data;
+  assert.equal(cards.map((c) => c.gameId).join(), '0013,0014');
+  assert.equal((await api.searchCards('0013')).data[0].id, 'CAR-013');
+  assert.equal((await api.searchCards(' car-014 ')).data[0].id, 'CAR-014');
+  assert.equal((await api.searchCards('car-01')).data.length, 0);
 });

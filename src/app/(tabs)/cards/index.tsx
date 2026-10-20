@@ -1,4 +1,4 @@
-import { CardsScreen } from '../views/CardsScreen';
+import { CardsScreen } from '../../../views/CardsScreen';
 
 export default function CardsRoute() {
   return <CardsScreen />;

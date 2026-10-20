@@ -1,6 +1,6 @@
 # Plan de implementación de VIMO
 
-> Para el estado de implementación y las verificaciones realizadas, consultar [Avances](docs/AVANCES.md). Las casillas finales representan aceptación completa; el contenido oficial y la validación en PostgreSQL y dispositivos continúan pendientes.
+> **Nota:** este plan se conserva como referencia histórica. Contemplaba un backend Node.js + TypeScript con PostgreSQL; la implementación vigente usa ASP.NET Core + SQL Server en el repositorio [VimoBackend](https://github.com/GaelGrezz/VimoBackend), con el catálogo real del GDD de AfterLight. El estado de implementación y las verificaciones realizadas están en [Avances](docs/AVANCES.md). Las casillas finales representan aceptación completa; la validación en dispositivos continúa pendiente.
 
 ## Objetivo
 

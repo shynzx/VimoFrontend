@@ -1,5 +1,6 @@
 export interface Card {
   id: string;
+  gameId?: string;
   name: string;
   type: string;
   cost?: number;

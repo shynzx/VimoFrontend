@@ -1,4 +1,5 @@
 import { Character, Enemy, Infrastructure } from '../types/models';
+import { record, text, optionalText, strings } from './validation';
 
 export class GuideModel {
   private static instance: GuideModel;
@@ -12,37 +13,42 @@ export class GuideModel {
     return GuideModel.instance;
   }
 
-  public mapToCharacter(raw: any): Character {
+  public mapToCharacter(value: unknown): Character {
+    const raw = record(value);
     return {
-      id: raw.id || '',
-      name: raw.name || '',
-      role: raw.role || '',
-      description: raw.description || '',
-      lore: raw.lore || '',
-      relatedCards: raw.relatedCards || [],
+      id: text(raw.id),
+      name: text(raw.name),
+      role: text(raw.role),
+      description: text(raw.description),
+      lore: text(raw.lore),
+      relatedCards: strings(raw.relatedCards),
     };
   }
 
-  public mapToEnemy(raw: any): Enemy {
+  public mapToEnemy(value: unknown): Enemy {
+    const raw = record(value);
+    const difficulty = optionalText(raw.difficulty)?.toLowerCase();
+    if (difficulty && !['baja', 'media', 'alta'].includes(difficulty)) throw new Error('Dificultad inválida.');
     return {
-      id: raw.id || '',
-      name: raw.name || '',
-      type: raw.type || '',
-      description: raw.description || '',
-      lore: raw.lore || '',
-      difficulty: raw.difficulty,
-      relatedCards: raw.relatedCards || [],
+      id: text(raw.id),
+      name: text(raw.name),
+      type: text(raw.type),
+      description: text(raw.description),
+      lore: text(raw.lore),
+      difficulty: difficulty as Enemy['difficulty'],
+      relatedCards: strings(raw.relatedCards),
     };
   }
 
-  public mapToInfrastructure(raw: any): Infrastructure {
+  public mapToInfrastructure(value: unknown): Infrastructure {
+    const raw = record(value);
     return {
-      id: raw.id || '',
-      name: raw.name || '',
-      type: raw.type || '',
-      description: raw.description || '',
-      lore: raw.lore || '',
-      location: raw.location,
+      id: text(raw.id),
+      name: text(raw.name),
+      type: text(raw.type),
+      description: text(raw.description),
+      lore: text(raw.lore),
+      location: optionalText(raw.location),
     };
   }
 }

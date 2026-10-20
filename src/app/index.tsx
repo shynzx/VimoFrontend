@@ -1,6 +1,6 @@
-import { CardsScreen } from '../views/CardsScreen';
+import { HomeScreen } from '../views/HomeScreen';
 import React from 'react';
 
 export default function IndexScreen() {
-  return <CardsScreen />;
+  return <HomeScreen />;
 }

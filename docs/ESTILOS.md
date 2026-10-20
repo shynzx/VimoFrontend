@@ -6,9 +6,9 @@ El diseño sigue el Figma **"Wireframes - After Light"** (`https://www.figma.com
 
 - `src/theme/tokens.ts`: única definición de colores, familias tipográficas, espaciado, radios, tamaños y escala de texto.
 - `src/theme/styles.ts`: estilos reutilizables creados una vez con `StyleSheet.create` (cabecera, paneles, etiquetas, secciones, acciones, pestañas y estados).
-- `src/components/AppButton.tsx`: acción del Figma ("Action", 56 de alto) con flecha hacia adelante o de regreso, variantes `primary` y `secondary`, estados deshabilitado y de carga.
-- `src/components/ScreenHeader.tsx`: botón de volver y título de la pantalla.
-- `src/components/Icon.tsx`: iconos de Lucide (`lucide-react-native`), los mismos del Figma, con trazo de 1 px.
+- `src/components/BotonApp.tsx`: acción del Figma ("Action", 56 de alto) con flecha hacia adelante o de regreso, variantes `primary` y `secondary`, estados deshabilitado y de carga.
+- `src/components/EncabezadoPantalla.tsx`: botón de volver y título de la pantalla.
+- `src/components/Icono.tsx`: iconos de Lucide (`lucide-react-native`), los mismos del Figma, con trazo de 1 px.
 - `assets/images/`: imágenes descargadas del Figma (portada y holograma del panel).
 
 ## Sistema visual
@@ -28,7 +28,7 @@ Tipografías (cargadas con `@expo-google-fonts` en `src/app/_layout.tsx`): **Raj
 
 1. Utilizar nombres semánticos (`colors.primary`, `colors.textSecondary`); mantener los colores literales dentro de `tokens.ts`.
 2. Reutilizar `ui.title`, `ui.display`, `ui.heading`, `ui.label`, `ui.body`, `ui.copy` y `ui.caption` para mantener la jerarquía del Figma.
-3. Usar `AppButton` para acciones y `ScreenHeader` para la cabecera. Reservar `TouchableOpacity` para tarjetas enlazadas, pestañas y teclas.
+3. Usar `BotonApp` para acciones y `EncabezadoPantalla` para la cabecera. Reservar `TouchableOpacity` para tarjetas enlazadas, pestañas y teclas.
 4. Los controles interactivos tienen un área táctil mínima de 48 unidades (el botón de volver de 36 usa `hitSlop`). Usar altura mínima en lugar de alturas fijas en contenedores con texto.
 5. Las pantallas comparten un ancho máximo de 720 unidades.
 6. Crear los estilos específicos fuera del render con `StyleSheet.create` y componerlos con los compartidos. Con `Link asChild`, pasar un estilo plano: Expo Router no acepta arreglos.

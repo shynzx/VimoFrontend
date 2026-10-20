@@ -13,7 +13,7 @@ El catálogo ya no usa datos de ejemplo: proviene del GDD de AfterLight y lo car
 | Cartas | Consulta por código de cuatro dígitos derivado del ID (`CAR-013` → `0013`; también se acepta `CAR-013`) y detalle con categoría, efecto por nivel, nivel máximo y disponibilidad. | Escaneo del código con la cámara. |
 | Archivo de lore | Pestañas Personajes, Enemigos y Lugares; perfil por secciones y enlaces a las cartas relacionadas. | Revisión visual en dispositivos. |
 | MVC | Vistas, controladores y modelos del cliente conectados; controladores y repositorios del backend separados. | Revisión final de arquitectura con el equipo. |
-| API | ASP.NET Core con rutas de catálogo y detalle, envoltorio `{ success, data, pagination?, meta }`, validación de parámetros, errores JSON y `GET /health`. | Despliegue con HTTPS. |
+| API | ASP.NET Core con rutas de catálogo y detalle, rutas y JSON en español (`/api/v1/cartas`, envoltorio `{ exito, datos, paginacion?, meta }`), validación de parámetros, errores JSON y `GET /salud`. | Despliegue con HTTPS. |
 | Base de datos | SQL Server (LocalDB en desarrollo) con Entity Framework Core; esquema y catálogo creados por migraciones. | Base de datos del entorno desplegado. |
 | Contenido | Catálogo real de la migración `RealCatalog`: 21 cartas, 4 personajes, 3 enemigos y 7 lugares. Se excluye el contenido interno del GDD, los finales y las peticiones de Issac. | Mantener el catálogo al día con el GDD mediante nuevas migraciones. |
 | Caché | Memoria y persistencia, TTL, límites, deduplicación, respaldo ante fallos, separación por servidor y validación de datos. | Medición en dispositivos. |

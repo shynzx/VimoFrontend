@@ -1,2 +1,2 @@
-export { CardsScreen } from './CardsScreen';
-export { GuideScreen } from './GuideScreen';
+export { PantallaCartas } from './PantallaCartas';
+export { PantallaGuia } from './PantallaGuia';

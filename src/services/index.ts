@@ -1,2 +1,2 @@
-export { ApiService } from './ApiService';
-export { CacheService } from './CacheService';
+export { ServicioApi } from './ServicioApi';
+export { ServicioCache } from './ServicioCache';

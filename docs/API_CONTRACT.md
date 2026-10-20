@@ -56,7 +56,7 @@ Todas las respuestas son JSON (`Content-Type: application/json; charset=utf-8`).
 }
 ```
 
-Códigos de error: `SOLICITUD_INVALIDA` (400), `NO_ENCONTRADO` (404, también para rutas inexistentes) y `SERVICIO_NO_DISPONIBLE` (503). Las respuestas de error fuera de `/api/v1` no incluyen `meta`.
+Códigos de error: `SOLICITUD_INVALIDA` (400), `NO_AUTORIZADO` (401), `ESCRITURA_DESACTIVADA` (403), `NO_ENCONTRADO` (404, también para rutas inexistentes), `CONFLICTO` (409) y `SERVICIO_NO_DISPONIBLE` (503). Las respuestas de error fuera de `/api/v1` no incluyen `meta`.
 
 ---
 
@@ -150,6 +150,22 @@ Detalle por `id` (`CAR-013`). HTTP 404 si no existe.
 ```
 
 `ubicacion` y `funcionJugable` son opcionales.
+
+## Escritura (CRUD)
+
+La app solo lee. La API también permite crear, editar y eliminar registros para administrar el catálogo:
+
+| Operación | Respuesta |
+| --- | --- |
+| `POST /api/v1/{recurso}` | 201 con `Location` y el registro creado. |
+| `PUT /api/v1/{recurso}/:id` | 200 con el registro actualizado. Reemplaza el registro completo, incluida `cartasRelacionadas`. |
+| `DELETE /api/v1/{recurso}/:id` | 204 sin cuerpo. |
+
+`{recurso}` es `cartas`, `personajes`, `enemigos` o `infraestructura`. El cuerpo usa los mismos campos que las respuestas, sin `actualizadoEn`; `id` solo se envía en `POST`.
+
+- Requieren la cabecera `X-Clave-Administracion`. Sin clave válida: 401 `NO_AUTORIZADO`. Si el servidor no tiene clave configurada: 403 `ESCRITURA_DESACTIVADA`.
+- Datos no válidos (campos obligatorios, longitudes, `categoria`, `dificultad`, formato del `id`, cartas relacionadas inexistentes): 400 `SOLICITUD_INVALIDA`.
+- `id` o `codigoJuego` repetidos, o eliminar una carta que siguen usando personajes o enemigos: 409 `CONFLICTO`.
 
 ## Correspondencia con el código
 

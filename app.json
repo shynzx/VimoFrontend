@@ -1,8 +1,10 @@
 {
   "expo": {
-    "name": "vimo",
+    "name": "VIMO",
     "slug": "vimo",
-    "version": "1.0.0",
+    "version": "0.1.0",
+    "description": "Aplicación de asistencia para jugadores - Violeta Móvil",
+    "scheme": "vimo",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,6 +22,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }

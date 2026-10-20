@@ -63,6 +63,6 @@ Cada pull request debe indicar su rama de origen y destino, comportamiento resul
 - Ramas permanentes locales: `main` (antes `master`) y `develop`.
 - Remoto `origin`: `https://github.com/shynzx/VimoFrontend.git` (repositorio privado). La protección de ramas se configura por separado en GitHub.
 - Versión base de desarrollo: `0.1.0`, todavía sin etiqueta de publicación local.
-- Sincronizar `package.json`, `package-lock.json` (raíz y `packages[""]`), `app.json` (`expo.version`), `server/package.json` y `server/package-lock.json` (raíz y `packages[""]`) al preparar una versión.
-- Validaciones: `npm run lint`, `npm run typecheck`, `npm test` y `npm run server:test`. Ejecutar también la prueba PostgreSQL en CI y validar Android/iOS para cambios móviles antes de una liberación.
-- El servidor Node incluido en este repositorio comparte su versión. El repositorio ASP.NET mantiene su propio ciclo de versión.
+- Sincronizar `package.json`, `package-lock.json` (raíz y `packages[""]`) y `app.json` (`expo.version`) al preparar una versión.
+- Validaciones: `npm run lint`, `npm run typecheck` y `npm test`. Validar Android/iOS para cambios móviles antes de una liberación.
+- La API es el repositorio ASP.NET (VimoBackend), con su propio ciclo de versión; un cambio de contrato requiere actualizar `docs/API_CONTRACT.md` en ambos lados.

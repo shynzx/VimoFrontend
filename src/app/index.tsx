@@ -1,6 +1,5 @@
-import { HomeScreen } from '../views/HomeScreen';
-import React from 'react';
+import { WelcomeScreen } from '../views/WelcomeScreen';
 
-export default function IndexScreen() {
-  return <HomeScreen />;
+export default function WelcomeRoute() {
+  return <WelcomeScreen />;
 }

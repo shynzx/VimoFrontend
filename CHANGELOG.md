@@ -1,6 +1,14 @@
 # Registro de cambios
 
-## Sin publicar — 0.1.0
+## Sin publicar
+
+- Diseño del Figma "Wireframes - After Light": tema oscuro, fuentes Rajdhani, Inter e IBM Plex Mono, iconos Lucide e imágenes descargadas del Figma.
+- Nuevas pantallas: portada, panel "Centro táctico", consulta por código con teclado numérico propio, detalle de carta y perfil del Archivo de lore. Las pilas de Cartas y Lore mantienen activa su pestaña en los detalles.
+- Modelo del catálogo real del GDD: cartas con `category`, `effect` por nivel, `availability` y `maxLevel`; personajes con `alias`, `abilities` y `weaknesses`; enemigos con `behavior` y `weaknesses`; lugares con `gameplay`. El código de cuatro dígitos se deriva de `CAR-013` si el servidor no lo envía y la búsqueda acepta ambos formatos.
+- Contrato de API actualizado para el backend .NET; se eliminan los datos de demostración del cliente y la caché pasa a `@vimo_cache:v3:`.
+- Se elimina la API Node/Express (`server/`), su base PostgreSQL de desarrollo (`compose.yaml`), los scripts `server:*` y sus pasos de CI. La API pasa a ser el backend .NET (VimoBackend).
+
+## 0.1.0
 
 - Tema compartido para colores, tipografía, espaciado, superficies y navegación.
 - Botones reutilizables con variantes y estados accesibles; estilos consistentes en todas las pantallas y modales.

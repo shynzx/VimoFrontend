@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 interface CacheEntry<T> { data: T; timestamp: number; ttl: number }
-const PREFIX = '@vimo_cache:v2:';
+const PREFIX = '@vimo_cache:v3:';
 const MAX_ENTRIES = 24;
 const MAX_ENTRY_BYTES = 2 * 1024 * 1024;
 

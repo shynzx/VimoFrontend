@@ -1,306 +1,127 @@
-import { AppButton } from '../components/AppButton';
-import { colors } from '../theme/tokens';
-import { ui } from '../theme/styles';
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  Keyboard,
-} from 'react-native';
-import { CardsController } from '../controllers/CardsController';
-import { Card } from '../types/models';
-import { CatalogResult } from '../types/catalog';
-import { CatalogNotice } from '../components/CatalogNotice';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CircleAlert, CircleCheck, Delete, Search } from 'lucide-react-native';
+import { AppButton } from '../components/AppButton';
+import { CatalogNotice } from '../components/CatalogNotice';
+import { Icon } from '../components/Icon';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { CardsController } from '../controllers/CardsController';
+import { useCatalog } from '../hooks/useCatalog';
+import { ui } from '../theme/styles';
+import { colors, radius, spacing, typography } from '../theme/tokens';
 
-export const CardsScreen: React.FC = () => {
-  const [cards, setCards] = useState<Card[]>([]);
-  const [query, setQuery] = useState('');
-  const [searchMode, setSearchMode] = useState<'id' | 'text'>('id');
-  const [loading, setLoading] = useState(true);
-  const [source, setSource] = useState<CatalogResult<Card>['source'] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+const CODE_LENGTH = 4;
+const controller = new CardsController();
+const loadCards = (force: boolean) => controller.getAllCards(force);
+const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'delete'] as const;
 
-  const cardsController = useMemo(() => new CardsController(), []);
-  const latestRequestIdRef = useRef(0);
+// Figma 03 · Búsqueda de cartas. El botón de cámara del diseño queda pendiente (requiere expo-camera).
+export function CardsScreen() {
+  const [code, setCode] = useState('');
+  const [notFound, setNotFound] = useState<string | null>(null);
+  const [consulting, setConsulting] = useState(false);
+  // Descarga el catálogo al abrir la pantalla para que la consulta sea inmediata.
+  const catalog = useCatalog(loadCards);
+  const complete = code.length === CODE_LENGTH;
 
-  const executeSearch = useCallback(
-    async (searchTerm: string, force = false) => {
-      const requestId = ++latestRequestIdRef.current;
-      if (searchMode === 'id' && searchTerm && !/^[0-9]{4}$/.test(searchTerm.trim())) {
-        setError('Escribe el ID completo de 4 dígitos, por ejemplo 0001.');
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      setError(null);
-
-      try {
-        const results = searchTerm.trim()
-          ? await cardsController.searchCards(searchTerm.trim(), force)
-          : await cardsController.getAllCards(force);
-
-        if (requestId === latestRequestIdRef.current) {
-          setCards(results.data);
-          setSource(results.source);
-          if (searchMode === 'id' && searchTerm.trim() && results.data.length === 1) {
-            Keyboard.dismiss();
-            setSelectedCard(results.data[0]);
-          }
-        }
-      } catch (err: unknown) {
-        if (requestId === latestRequestIdRef.current) {
-          const message = err instanceof Error ? err.message : 'Error al buscar cartas';
-          setError(message);
-        }
-      } finally {
-        if (requestId === latestRequestIdRef.current) {
-          setLoading(false);
-        }
-      }
-    },
-    [cardsController, searchMode]
-  );
-
-  useEffect(() => {
-    let isCancelled = false;
-    const requestId = ++latestRequestIdRef.current;
-
-    const loadInitialCards = async () => {
-      try {
-        const initialCards = await cardsController.getAllCards();
-        if (!isCancelled && requestId === latestRequestIdRef.current) {
-          setCards(initialCards.data);
-          setSource(initialCards.source);
-        }
-      } catch (err: unknown) {
-        if (!isCancelled && requestId === latestRequestIdRef.current) {
-          const message = err instanceof Error ? err.message : 'Error al cargar cartas iniciales';
-          setError(message);
-        }
-      } finally {
-        if (!isCancelled && requestId === latestRequestIdRef.current) setLoading(false);
-      }
-    };
-
-    loadInitialCards();
-
-    return () => {
-      isCancelled = true;
-      latestRequestIdRef.current += 1;
-    };
-  }, [cardsController]);
-
-  const handleSearchPress = () => {
-    executeSearch(query);
+  const press = (key: (typeof KEYS)[number]) => {
+    setNotFound(null);
+    if (key === 'delete') setCode((value) => value.slice(0, -1));
+    else if (key) setCode((value) => (value.length < CODE_LENGTH ? value + key : value));
   };
 
-  const handleRetry = () => {
-    executeSearch(query, true);
+  const consult = async () => {
+    if (!complete) return;
+    setConsulting(true);
+    try {
+      const card = (await controller.searchCards(code)).data[0];
+      if (card) router.push({ pathname: '/cards/[id]', params: { id: card.id } });
+      else setNotFound(code);
+    } catch {
+      await catalog.reload();
+    } finally {
+      setConsulting(false);
+    }
   };
 
-  const handleClearQuery = () => {
-    setQuery('');
-    executeSearch('');
-  };
+  const status = notFound
+    ? { icon: CircleAlert, color: colors.primary, text: `No hay ninguna carta con el código ${notFound}.` }
+    : complete
+      ? { icon: CircleCheck, color: colors.primary, text: 'Código completo · listo para consultar' }
+      : { icon: null, color: colors.textSecondary, text: `Faltan ${CODE_LENGTH - code.length} dígitos.` };
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right']}>
-      <Text style={styles.title} accessibilityRole="header">
-        Base de datos de cartas
-      </Text>
-
-      <Text style={ui.intro}>Consulta en el celular el potenciador que estás viendo en tu partida de PC.</Text>
-      <View style={ui.tabs}>
-        {(['id', 'text'] as const).map((mode) => (
-          <TouchableOpacity key={mode} accessibilityRole="button" accessibilityState={{ selected: searchMode === mode }}
-            style={[ui.tab, searchMode === mode && ui.activeTab]}
-            onPress={() => {
-              latestRequestIdRef.current++;
-              setSearchMode(mode); setQuery(''); setError(null); setLoading(false); setCards([]);
-            }}>
-            <Text style={[ui.tabText, searchMode === mode && ui.activeTabText]}>{mode === 'id' ? 'ID de 4 dígitos' : 'Buscar por texto'}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.searchRow}>
-        <TextInput
-          key={searchMode}
-          style={styles.input}
-          placeholder={searchMode === 'id' ? 'ID del juego: 0001' : 'Nombre, efecto, tipo o etiqueta...'}
-          keyboardType={searchMode === 'id' ? 'number-pad' : 'default'}
-          maxLength={searchMode === 'id' ? 4 : 200}
-          placeholderTextColor={colors.textSecondary}
-          value={query}
-          onChangeText={setQuery}
-          onSubmitEditing={handleSearchPress}
-          returnKeyType="search"
-          accessibilityLabel={searchMode === 'id' ? 'ID de la carta de 4 dígitos' : 'Campo de búsqueda de cartas por texto'}
-        />
-        {query.length > 0 && (
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={handleClearQuery}
-            accessibilityLabel="Limpiar texto de búsqueda"
-            accessibilityRole="button"
-          >
-            <Text style={styles.clearButtonText}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <AppButton title="Buscar" onPress={handleSearchPress} disabled={loading} style={ui.actionSpacing} accessibilityLabel="Buscar cartas" />
-
-      <AppButton title="Actualizar catálogo" variant="secondary" onPress={handleRetry} disabled={loading} style={ui.actionSpacing} />
-      <CatalogNotice source={source} />
-
-      {error ? (
-        <View style={styles.errorContainer} accessibilityRole="alert">
-          <Text style={styles.errorText}>{error}</Text>
-          <AppButton title="Reintentar" variant="danger" onPress={handleRetry} />
+    <SafeAreaView style={ui.screen} edges={['top', 'left', 'right']}>
+      <ScreenHeader title="Base de datos de cartas" fallback="/home" />
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.instructions}>
+          <Text style={ui.label}>Consulta rápida / ID de carta</Text>
+          <Text style={styles.heading} accessibilityRole="header">Ingresa el código de la carta (ej. 0013)</Text>
+          <Text style={ui.description}>Escribe los 4 dígitos que aparecen en la carta.</Text>
         </View>
-      ) : null}
 
-      {loading ? (
-        <View style={styles.loadingContainer} accessibilityLabel="Cargando cartas">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Cargando cartas...</Text>
-        </View>
-      ) : (
-        <FlatList
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          data={cards}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>{query ? 'Sin resultados' : 'Consulta una carta'}</Text>
-              <Text style={styles.emptySubtitle}>
-                {query ? `No se encontraron cartas para "${query}".` : 'Introduce el ID que aparece en PC o utiliza la búsqueda por texto.'}
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => setSelectedCard(item)}
-              accessibilityRole="button"
-              accessibilityLabel={`Carta ${item.name}, costo ${item.cost}, tipo ${item.type}`}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardName}>{item.name}</Text>
-                {item.rarity ? <Text style={styles.cardRarity}>{item.rarity}</Text> : null}
-              </View>
-              {item.gameId && <Text style={styles.cardDetails}>ID: {item.gameId}</Text>}
-              <Text style={styles.cardDetails}>
-                Tipo: {item.type} | Costo: {item.cost}
-              </Text>
-              <Text style={styles.cardEffect}>{item.effect}</Text>
-              <Text style={styles.cardDesc} numberOfLines={2}>
-                {item.description}
-              </Text>
-              {item.tags && item.tags.length > 0 ? (
-                <View style={styles.tagsContainer}>
-                  {item.tags.map((tag) => (
-                    <View key={tag} style={styles.tagBadge}>
-                      <Text style={styles.tagText}>{tag}</Text>
-                    </View>
-                  ))}
-                </View>
-              ) : null}
-            </TouchableOpacity>
-          )}
-          refreshing={loading}
-          onRefresh={handleRetry}
-        />
-      )}
-
-      {/* Modal de Detalle de Carta */}
-      <Modal
-        visible={!!selectedCard}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setSelectedCard(null)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {selectedCard && (
-              <ScrollView>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.modalTitle}>{selectedCard.name}</Text>
-                  {selectedCard.rarity ? <Text style={styles.cardRarity}>{selectedCard.rarity}</Text> : null}
-                </View>
-                {selectedCard.gameId && <Text style={styles.modalSubtitle}>ID del juego: {selectedCard.gameId}</Text>}
-                <Text style={styles.modalSubtitle}>
-                  Tipo: {selectedCard.type} | Costo de energía: {selectedCard.cost}
-                </Text>
-
-                <Text style={styles.sectionHeader}>Efecto</Text>
-                <Text style={styles.modalEffect}>{selectedCard.effect}</Text>
-
-                <Text style={styles.sectionHeader}>Descripción detallada</Text>
-                <Text style={styles.modalDesc}>{selectedCard.description}</Text>
-
-                {selectedCard.tags && selectedCard.tags.length > 0 ? (
-                  <>
-                    <Text style={styles.sectionHeader}>Etiquetas</Text>
-                    <View style={styles.tagsContainer}>
-                      {selectedCard.tags.map((tag) => (
-                        <View key={tag} style={styles.tagBadge}>
-                          <Text style={styles.tagText}>{tag}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  </>
-                ) : null}
-
-                <AppButton title="Cerrar" onPress={() => setSelectedCard(null)} style={ui.closeSpacing} accessibilityLabel="Cerrar detalle de carta" />
-              </ScrollView>
-            )}
+        <View style={styles.field} accessible accessibilityLabel={code ? `Código ${code.split('').join(' ')}` : 'Código vacío'}>
+          <Icon icon={Search} size={24} />
+          <View style={styles.codeInput}>
+            <Text style={[styles.code, !code && styles.placeholder]}>{code || '0000'}</Text>
+            <View style={styles.cursor} />
           </View>
         </View>
-      </Modal>
+
+        <View style={ui.row} accessibilityLiveRegion="polite">
+          {status.icon && <Icon icon={status.icon} size={16} color={status.color} />}
+          <Text style={[ui.caption, { color: status.color }]}>{status.text}</Text>
+        </View>
+
+        <AppButton title="Consultar carta" disabled={!complete} loading={consulting} onPress={() => void consult()} />
+
+        <CatalogNotice source={catalog.result?.source ?? null} />
+        {catalog.error && !catalog.loading && (
+          <View style={styles.error}>
+            <Text style={ui.errorText} accessibilityRole="alert">{catalog.error}</Text>
+            <AppButton title="Reintentar" variant="secondary" onPress={() => void catalog.reload()} />
+          </View>
+        )}
+        <Text style={ui.fine}>Solo consulta. No modifica tu partida.</Text>
+      </ScrollView>
+
+      <View style={styles.keyboard}>
+        {[0, 1, 2, 3].map((row) => (
+          <View key={row} style={styles.keyRow}>
+            {KEYS.slice(row * 3, row * 3 + 3).map((key) => key === '' ? (
+              <View key="blank" style={styles.keySpacer} />
+            ) : (
+              <TouchableOpacity key={key} style={styles.key} onPress={() => press(key)}
+                onLongPress={key === 'delete' ? () => { setCode(''); setNotFound(null); } : undefined}
+                accessibilityRole="button" accessibilityLabel={key === 'delete' ? 'Borrar dígito' : key}>
+                {key === 'delete' ? <Icon icon={Delete} color={colors.text} /> : <Text style={styles.keyText}>{key}</Text>}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </View>
     </SafeAreaView>
   );
-};
+}
 
-const styles = {
-  container: ui.screen,
-  title: ui.title,
-  searchRow: ui.searchRow,
-  input: ui.input,
-  clearButton: ui.clearButton,
-  clearButtonText: ui.clearText,
-  errorContainer: ui.errorContainer,
-  errorText: ui.errorText,
-  loadingContainer: ui.loading,
-  loadingText: ui.caption,
-  emptyContainer: ui.empty,
-  emptyTitle: ui.heading,
-  emptySubtitle: ui.emptyText,
-  card: ui.listItem,
-  cardHeader: ui.row,
-  cardName: ui.heading,
-  cardRarity: ui.badge,
-  cardDetails: ui.caption,
-  cardEffect: ui.effect,
-  cardDesc: ui.description,
-  tagsContainer: ui.tags,
-  tagBadge: ui.tag,
-  tagText: ui.tagText,
-  modalOverlay: ui.overlay,
-  modalContent: ui.modal,
-  modalTitle: ui.heading,
-  modalSubtitle: ui.caption,
-  sectionHeader: ui.sectionHeading,
-  modalEffect: ui.effect,
-  modalDesc: ui.body,
-};
+const styles = StyleSheet.create({
+  content: { gap: 22, paddingHorizontal: spacing.xl, paddingTop: 20, paddingBottom: spacing.xl },
+  instructions: { gap: spacing.md },
+  heading: { ...typography.display, fontSize: 29, lineHeight: 30.5, color: colors.text, textTransform: 'uppercase' },
+  field: {
+    minHeight: 80, flexDirection: 'row', alignItems: 'center', gap: spacing.lg, paddingHorizontal: 18,
+    backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.primary, borderRadius: radius.md,
+  },
+  codeInput: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  code: { ...typography.code, color: colors.text, letterSpacing: 2 },
+  placeholder: { color: colors.border },
+  cursor: { width: 2, height: 34, backgroundColor: colors.primary },
+  error: { gap: spacing.md },
+  keyboard: { backgroundColor: colors.surface, paddingHorizontal: spacing.md, paddingTop: 14, paddingBottom: spacing.md, gap: spacing.sm },
+  keyRow: { flexDirection: 'row', gap: spacing.sm },
+  key: { flex: 1, height: 60, borderRadius: radius.sm, backgroundColor: colors.surfaceRaised, alignItems: 'center', justifyContent: 'center' },
+  keySpacer: { flex: 1, height: 60 },
+  keyText: { ...typography.key, color: colors.text },
+});

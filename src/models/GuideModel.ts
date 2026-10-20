@@ -18,8 +18,11 @@ export class GuideModel {
     return {
       id: text(raw.id),
       name: text(raw.name),
+      alias: optionalText(raw.alias),
       role: text(raw.role),
       description: text(raw.description),
+      abilities: optionalText(raw.abilities),
+      weaknesses: strings(raw.weaknesses),
       lore: text(raw.lore),
       relatedCards: strings(raw.relatedCards),
     };
@@ -34,6 +37,8 @@ export class GuideModel {
       name: text(raw.name),
       type: text(raw.type),
       description: text(raw.description),
+      behavior: optionalText(raw.behavior),
+      weaknesses: strings(raw.weaknesses),
       lore: text(raw.lore),
       difficulty: difficulty as Enemy['difficulty'],
       relatedCards: strings(raw.relatedCards),
@@ -47,6 +52,7 @@ export class GuideModel {
       name: text(raw.name),
       type: text(raw.type),
       description: text(raw.description),
+      gameplay: optionalText(raw.gameplay),
       lore: text(raw.lore),
       location: optionalText(raw.location),
     };

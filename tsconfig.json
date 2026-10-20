@@ -4,7 +4,6 @@
     "strict": true
   },
   "exclude": [
-    "server",
     "node_modules",
     "dist",
     "dist-dev",

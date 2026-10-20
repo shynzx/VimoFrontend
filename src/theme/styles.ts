@@ -1,64 +1,82 @@
 import { StyleSheet } from 'react-native';
-import type { ViewStyle } from 'react-native';
 import { colors, radius, sizes, spacing, typography } from './tokens';
 
-const surface = {
-  backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radius.md,
-  borderWidth: 1, borderColor: colors.border,
-} satisfies ViewStyle;
-
 export const ui = StyleSheet.create({
+  // Estructura
   scene: { backgroundColor: colors.background },
-  navigationBar: { backgroundColor: colors.surface, borderTopColor: colors.border },
-  screen: { flex: 1, width: '100%', maxWidth: sizes.contentMaxWidth, alignSelf: 'center', padding: spacing.lg, backgroundColor: colors.background },
-  scrollContent: { gap: spacing.lg, paddingBottom: spacing.xl },
+  screen: { flex: 1, width: '100%', maxWidth: sizes.contentMaxWidth, alignSelf: 'center', backgroundColor: colors.background },
+  scrollContent: { gap: spacing.lg, paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.xl },
   flex: { flex: 1 },
-  brand: { ...typography.brand, color: colors.primary },
-  title: { ...typography.title, color: colors.text, marginBottom: spacing.lg },
-  heading: { ...typography.heading, color: colors.text, flexShrink: 1 },
-  lead: { ...typography.lead, color: colors.textSecondary },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  spaceBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+
+  // Cabecera de navegación (Figma: "Navigation", 60 de alto)
+  navigation: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: spacing.lg, paddingHorizontal: spacing.xl },
+  backButton: {
+    width: 36, height: 36, borderRadius: radius.sm, backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.primary, alignItems: 'center', justifyContent: 'center',
+  },
+  // Área táctil de 48 alrededor del botón visual de 36.
+  backHitSlop: { top: 6, bottom: 6, left: 6, right: 6 },
+  navigationTitle: { ...typography.navigation, color: colors.text, flexShrink: 1, textTransform: 'uppercase' },
+
+  // Texto
+  hero: { ...typography.hero, color: colors.text },
+  title: { ...typography.title, color: colors.text, textTransform: 'uppercase' },
+  display: { ...typography.display, color: colors.text, textTransform: 'uppercase' },
+  heading: { ...typography.heading, color: colors.text, textTransform: 'uppercase' },
+  label: { ...typography.label, color: colors.primary, textTransform: 'uppercase' },
   body: { ...typography.body, color: colors.text },
   description: { ...typography.body, color: colors.textSecondary },
-  caption: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.xs },
-  intro: { ...typography.body, color: colors.textSecondary, marginBottom: spacing.md },
-  actionText: { ...typography.label, color: colors.primary },
-  card: surface,
-  listItem: { ...surface, marginBottom: spacing.md },
-  homeCard: { ...surface, padding: spacing.xl, gap: spacing.md },
-  detailCard: { ...surface, gap: spacing.md },
-  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm, marginBottom: spacing.sm },
-  button: { minHeight: sizes.touchTarget, paddingVertical: spacing.md, paddingHorizontal: spacing.lg, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  copy: { ...typography.bodySmall, color: colors.textSecondary },
+  caption: { ...typography.caption, color: colors.textSecondary },
+  fine: { ...typography.fine, color: colors.textSecondary },
+
+  // Superficies
+  panel: {
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.primary,
+    borderRadius: radius.lg, padding: 20, gap: spacing.md,
+  },
+  listItem: {
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    borderRadius: radius.lg, padding: spacing.lg, gap: spacing.xs,
+  },
+  highlight: {
+    backgroundColor: colors.primarySoft, borderWidth: 1, borderColor: colors.primary,
+    borderRadius: radius.md, padding: spacing.lg, gap: spacing.md,
+  },
+  badge: {
+    alignSelf: 'flex-start', backgroundColor: colors.badge, borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm, paddingVertical: 5,
+  },
+  section: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10, gap: spacing.xs },
+
+  // Acciones (Figma: "Action", 56 de alto)
+  button: {
+    minHeight: sizes.action, borderRadius: radius.md, borderWidth: 1, borderColor: colors.primary,
+    paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md,
+  },
   primaryButton: { backgroundColor: colors.primary },
-  secondaryButton: { backgroundColor: colors.primarySoft },
-  dangerButton: { backgroundColor: colors.danger },
-  buttonText: { ...typography.label, color: colors.onPrimary, textAlign: 'center' },
-  secondaryButtonText: { ...typography.label, color: colors.primary, textAlign: 'center' },
+  secondaryButton: { backgroundColor: colors.surface },
+  buttonText: { ...typography.button, color: colors.onPrimary, textTransform: 'uppercase', flexShrink: 1 },
   disabled: { opacity: 0.45 },
-  actionSpacing: { marginBottom: spacing.md },
-  closeSpacing: { marginTop: spacing.lg },
-  searchRow: { position: 'relative', marginBottom: spacing.sm },
-  input: { ...typography.body, minHeight: sizes.touchTarget, backgroundColor: colors.surface, color: colors.text, padding: spacing.md, paddingRight: sizes.touchTarget + spacing.sm, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border },
-  clearButton: { position: 'absolute', right: 0, top: 0, bottom: 0, width: sizes.touchTarget, minHeight: sizes.touchTarget, alignItems: 'center', justifyContent: 'center' },
-  clearText: { ...typography.label, color: colors.textSecondary },
-  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  tab: { flexGrow: 1, minHeight: sizes.touchTarget, padding: spacing.md, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm, backgroundColor: colors.primarySoft },
-  activeTab: { backgroundColor: colors.primary },
-  tabText: { ...typography.label, color: colors.primary },
-  activeTabText: { color: colors.onPrimary },
-  errorContainer: { backgroundColor: colors.dangerSoft, borderWidth: 1, borderColor: colors.danger, padding: spacing.md, borderRadius: radius.sm, marginBottom: spacing.md, gap: spacing.sm },
-  errorText: { ...typography.body, color: colors.danger },
-  notice: { ...typography.caption, color: colors.warning, backgroundColor: colors.warningSoft, padding: spacing.md, borderRadius: radius.sm, marginBottom: spacing.md },
+
+  // Pestañas internas (Archivo de lore)
+  tabs: { flexDirection: 'row', gap: spacing.sm },
+  tab: {
+    flex: 1, minHeight: sizes.touchTarget, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xs,
+  },
+  activeTab: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
+  tabText: { ...typography.label, color: colors.textSecondary, textAlign: 'center', textTransform: 'uppercase' },
+  activeTabText: { color: colors.primary },
+
+  // Estados
+  notice: {
+    ...typography.caption, color: colors.warning, backgroundColor: colors.warningSoft,
+    borderRadius: radius.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+  },
+  errorText: { ...typography.caption, color: colors.danger },
   loading: { padding: spacing.xxl, alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
-  empty: { padding: spacing.xl, alignItems: 'center', gap: spacing.sm },
   emptyText: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },
-  effect: { ...typography.label, color: colors.primary, marginBottom: spacing.sm },
-  lore: { ...typography.body, color: colors.textSecondary, fontStyle: 'italic' },
-  badge: { ...typography.caption, color: colors.primary, backgroundColor: colors.primarySoft, paddingVertical: spacing.xs, paddingHorizontal: spacing.sm, borderRadius: radius.sm, flexShrink: 1 },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
-  tag: { backgroundColor: colors.primarySoft, paddingVertical: spacing.xs, paddingHorizontal: spacing.sm, borderRadius: radius.pill },
-  tagText: { ...typography.caption, color: colors.primary },
-  tagLink: { minHeight: sizes.touchTarget, justifyContent: 'center' },
-  overlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'center', padding: spacing.lg },
-  modal: { width: '100%', maxWidth: sizes.modalMaxWidth, alignSelf: 'center', backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.xl, maxHeight: '85%' },
-  sectionHeading: { ...typography.label, color: colors.text, marginTop: spacing.lg, marginBottom: spacing.sm },
 });

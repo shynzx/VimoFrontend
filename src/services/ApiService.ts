@@ -101,9 +101,11 @@ export class ApiService {
     if (/^[0-9]+$/.test(q)) {
       return { ...result, data: /^[0-9]{4}$/.test(q) ? result.data.filter((card) => card.gameId === q) : [] };
     }
+    if (/^car-[0-9]{3}$/.test(q)) {
+      return { ...result, data: result.data.filter((card) => card.id.toLowerCase() === q) };
+    }
     return { ...result, data: result.data.filter((card) =>
-      [card.name, card.type, card.description, card.effect, ...(card.tags || [])]
-        .some((value) => normalizeSearch(value).includes(q))) };
+      [card.name, card.category, card.effect].some((value) => normalizeSearch(value).includes(q))) };
   }
   public getCharacters(force = false): Promise<CatalogResult<Character>> {
     return this.load('characters', (raw) => GuideModel.getInstance().mapToCharacter(raw), force);

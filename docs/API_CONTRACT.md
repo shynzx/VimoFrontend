@@ -1,207 +1,152 @@
 # Contrato de API de VIMO (v1)
 
+Implementación de referencia: backend ASP.NET Core + SQL Server (repositorio `VimoBackend`).
+
 ## Base URL
 `/api/v1`
 
-## Identificador visible de cartas
+## Catálogo
 
-Las cartas pueden incluir `gameId`, una cadena de exactamente cuatro dígitos, por ejemplo `"0001"`. Corresponde al ID mostrado en el juego de PC y conserva sus ceros iniciales. `id` sigue siendo la clave interna para detalles y relaciones. El catálogo oficial deberá proporcionar estos códigos; los ejemplos incluyen códigos de demostración.
+El catálogo proviene del GDD de AfterLight y se carga con las migraciones del backend:
 
-`GET /api/v1/cards?q=0001` busca el código exacto cuando `q` contiene solo dígitos; no realiza coincidencias parciales por código. Ejecutar `db:migrate` en bases existentes para añadir la columna nullable `game_id` y su índice único. Los registros anteriores no reciben códigos inventados y continúan accesibles mediante búsqueda textual.
+- **Cartas:** hoja "Cartas de mejora" de `AfterLight_Stats.xlsx` (21 cartas, `CAR-001` a `CAR-021`).
+- **Personajes:** `03 - Historia y Mundo/03 - Personajes.md`.
+- **Enemigos:** `04 - Contenido/03 - Enemigos y NPC.md`.
+- **Infraestructura:** tabla "Lugares" de `03 - Historia y Mundo/02 - Mundo.md`.
 
-## Estado del catálogo y disponibilidad
+No se publica el contenido que el GDD marca como interno (dirigentes de Cerberus, Consejo, "Información reservada"), ni los finales o las peticiones de Issac.
 
-El catálogo oficial sigue pendiente de entrega. Los ejemplos de este documento y del código no deben considerarse información validada del juego.
+Las respuestas bajo `/api/v1` incluyen `meta: { "demo": true | false }`. Es `true` mientras `Vimo:CatalogStatus` no sea `approved`; el cliente muestra entonces un aviso. No existe modo de datos de demostración: la API siempre consulta SQL Server.
 
-Las respuestas bajo `/api/v1` incluyen `meta: { "demo": true | false }`. Este indicador es verdadero en `DATA_MODE=demo` o mientras `CATALOG_STATUS` no sea `approved`, incluso cuando se consulta PostgreSQL. El cliente muestra el aviso de demostración y conserva esa marca en la caché.
+`GET /health` responde `{ "success": true, "data": { "database": "up" } }`, o HTTP 503 con `"database": "down"` si SQL Server no está disponible.
 
-`GET /health` informa el modo de datos y el estado de PostgreSQL. Devuelve HTTP 503 si la base no está disponible en modo PostgreSQL; en modo demo informa que la base está deshabilitada. Los fallos de PostgreSQL no activan el modo demo automáticamente.
+## Códigos de carta
 
-## Formato de Respuestas
+Cada carta tiene dos identificadores:
 
-Todas las respuestas exitosas devuelven formato JSON con encabezado `Content-Type: application/json; charset=utf-8`.
+- `id`: ID del diseño, por ejemplo `"CAR-013"`. Clave para detalles y relaciones (`relatedCards`).
+- `gameId`: código de cuatro dígitos que el jugador escribe en la app, por ejemplo `"0013"`. Se deriva del número de la carta y conserva los ceros iniciales.
 
-### Estructura de Respuesta Estándar
+`GET /api/v1/cards?q=` interpreta `q` así:
+
+| `q` | Búsqueda |
+| --- | --- |
+| Solo dígitos (`0013`) | `gameId` exacto; `013` no encuentra `0013`. |
+| `CAR-` + 3 dígitos (`car-013`) | `id` exacto, sin distinguir mayúsculas. |
+| Cualquier otro texto | Coincidencia parcial en `name`, `effect` y `category`, sin distinguir mayúsculas. |
+
+## Formato de respuestas
+
+Todas las respuestas son JSON (`Content-Type: application/json; charset=utf-8`). Los campos opcionales sin valor se omiten.
+
 ```json
 {
   "success": true,
   "data": [ ... ],
-  "pagination": {
-    "page": 1,
-    "limit": 20,
-    "total": 45,
-    "totalPages": 3
-  }
+  "pagination": { "page": 1, "limit": 20, "total": 21, "totalPages": 2 },
+  "meta": { "demo": false }
 }
 ```
 
-### Estructura de Error Estándar
 ```json
 {
   "success": false,
-  "error": {
-    "code": "BAD_REQUEST",
-    "message": "Descripción detallada del error"
-  }
+  "error": { "code": "BAD_REQUEST", "message": "Descripción del error" },
+  "meta": { "demo": false }
 }
 ```
+
+Códigos de error: `BAD_REQUEST` (400), `NOT_FOUND` (404, también para rutas inexistentes) y `SERVICE_UNAVAILABLE` (503).
 
 ---
 
 ## Endpoints
 
-### 1. Cartas
+### Cartas
 
 #### `GET /api/v1/cards`
-Lista cartas con soporte de búsqueda y paginación.
 
-- **Query Parameters**:
-  - `q` (string, opcional): Término de búsqueda (busca en `name`, `description`, `effect` y `tags`). Búsqueda insensible a mayúsculas.
-  - `type` (string, opcional): Filtrar por tipo (ej. `Ataque`, `Defensa`, `Hechizo`, `Especial`).
-  - `page` (number, opcional, por defecto `1`): Número de página.
-  - `limit` (number, opcional, por defecto `20`, máx `100`): Cantidad de elementos por página.
+- `q` (opcional, hasta 200 caracteres): ver "Códigos de carta".
+- `category` (opcional, hasta 64 caracteres): categoría exacta sin distinguir mayúsculas: `Supervivencia`, `Batería`, `Linterna`, `Combate`, `Movimiento` o `Interacción`.
+- `page` (entero de 1 a 1 000 000, por defecto 1) y `limit` (entero de 1 a 100, por defecto 20).
 
-`page` debe ser un entero entre 1 y 1 000 000, y `limit` entre 1 y 100. Los valores inválidos producen HTTP 400. `q` admite hasta 200 caracteres y `type` hasta 64; no se admiten valores repetidos para estos filtros. El cliente descarga todas las páginas de cartas y aplica adicionalmente una búsqueda local sin distinguir acentos, incluyendo el tipo.
+Valores inválidos o parámetros repetidos producen HTTP 400. Las cartas se ordenan por `id`. El cliente descarga todas las páginas y busca localmente.
 
-- **Respuesta 200 OK**:
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": "card-01",
-      "name": "Golpe Violeta",
-      "type": "Ataque",
-      "cost": 2,
-      "rarity": "Común",
-      "effect": "Inflige 15 de daño y aplica Vulnerabilidad durante 1 turno.",
-      "description": "Una descarga de energía violeta canalizada a través del núcleo del avatar.",
-      "tags": ["ataque", "violeta", "vulnerabilidad"],
-      "updatedAt": "2026-10-15T00:00:00.000Z"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 20,
-    "total": 1,
-    "totalPages": 1
-  }
+  "id": "CAR-013",
+  "gameId": "0013",
+  "name": "Gatillo optimizado",
+  "category": "Combate",
+  "effect": "+10% de la cadencia base del arma equipada.",
+  "availability": "Tienda y UI",
+  "maxLevel": 4,
+  "updatedAt": "2026-10-20T00:00:00.000Z"
 }
 ```
+
+`effect` describe un nivel; cada compra o elección sube un nivel hasta `maxLevel` y los efectos se acumulan de forma aditiva.
 
 #### `GET /api/v1/cards/:id`
-Obtiene los detalles completos de una carta específica.
 
-- **Parámetros de ruta**: `id` (string)
-- **Respuesta 200 OK**:
+Detalle por `id` (`CAR-013`). HTTP 404 si no existe.
+
+### Personajes
+
+#### `GET /api/v1/characters` · `GET /api/v1/characters/:id`
+
 ```json
 {
-  "success": true,
-  "data": {
-    "id": "card-01",
-    "name": "Golpe Violeta",
-    "type": "Ataque",
-    "cost": 2,
-    "rarity": "Común",
-    "effect": "Inflige 15 de daño y aplica Vulnerabilidad durante 1 turno.",
-    "description": "Una descarga de energía violeta canalizada a través del núcleo del avatar.",
-    "tags": ["ataque", "violeta", "vulnerabilidad"],
-    "updatedAt": "2026-10-15T00:00:00.000Z"
-  }
-}
-```
-- **Respuesta 404 Not Found**:
-```json
-{
-  "success": false,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Carta con id 'card-999' no encontrada."
-  }
+  "id": "nicolas-varela",
+  "name": "Nicolás Varela",
+  "alias": "Enlace",
+  "role": "Operador de comunicaciones de Cerberus",
+  "description": "Aspecto y personalidad.",
+  "abilities": "Coordinación operativa, lectura de reportes y comunicación de procedimientos.",
+  "weaknesses": ["Depende de los canales disponibles"],
+  "lore": "Papel en la historia.",
+  "relatedCards": [],
+  "updatedAt": "2026-10-20T00:00:00.000Z"
 }
 ```
 
----
+`alias` y `abilities` son opcionales.
 
-### 2. Personajes
+### Enemigos
 
-#### `GET /api/v1/characters`
-Lista los personajes principales y de apoyo.
+#### `GET /api/v1/enemies` · `GET /api/v1/enemies/:id`
 
-- **Respuesta 200 OK**:
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": "char-01",
-      "name": "Violeta",
-      "role": "Protagonista / Estratega",
-      "description": "Líder de la resistencia contra la distorsión del Velo.",
-      "lore": "Nacida en la ciudadela de Neón, descubrió su habilidad para sintonizar los fragmentos violeta a temprana edad.",
-      "relatedCards": ["card-01", "card-03"],
-      "updatedAt": "2026-10-15T00:00:00.000Z"
-    }
-  ]
+  "id": "quimera",
+  "name": "Quimera",
+  "type": "Enemigo regular",
+  "description": "Rol de combate.",
+  "behavior": "Comportamiento y ataques.",
+  "weaknesses": ["Movimiento ordinario lento"],
+  "lore": "Aspecto.",
+  "relatedCards": ["CAR-008", "CAR-009", "CAR-010", "CAR-011"],
+  "updatedAt": "2026-10-20T00:00:00.000Z"
 }
 ```
 
-#### `GET /api/v1/characters/:id`
-Obtiene el detalle completo de un personaje.
+`difficulty` (`Baja`, `Media` o `Alta`) y `behavior` son opcionales; la dificultad se omite mientras el balance esté por definir.
 
----
+### Infraestructura
 
-### 3. Enemigos
+#### `GET /api/v1/infrastructure` · `GET /api/v1/infrastructure/:id`
 
-#### `GET /api/v1/enemies`
-Lista las entidades hostiles y jefes.
-
-- **Respuesta 200 OK**:
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": "enemy-01",
-      "name": "Centinela Carmesí",
-      "type": "Mecánico Autómata",
-      "difficulty": "Media",
-      "description": "Guardián blindado del sector perimetral.",
-      "lore": "Construido durante la Gran Fractura para vigilar las torres de resonancia.",
-      "relatedCards": ["card-02"],
-      "updatedAt": "2026-10-15T00:00:00.000Z"
-    }
-  ]
+  "id": "sectores-energia",
+  "name": "Sectores de energía y mantenimiento",
+  "type": "Sector",
+  "location": "Centro científico",
+  "description": "Áreas que albergan generadores y equipos de servicio.",
+  "gameplay": "Reparación y defensa de infraestructura.",
+  "lore": "Explican la dependencia de la energía y la pérdida de iluminación.",
+  "updatedAt": "2026-10-20T00:00:00.000Z"
 }
 ```
 
-#### `GET /api/v1/enemies/:id`
-Obtiene el detalle completo de un enemigo.
-
----
-
-### 4. Infraestructura
-
-#### `GET /api/v1/infrastructure`
-Lista las instalaciones, zonas y nodos del juego.
-
-- **Respuesta 200 OK**:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "infra-01",
-      "name": "Torre de Resonancia Alpha",
-      "type": "Instalación Energética",
-      "location": "Sector Central - Sector 4",
-      "description": "Estructura principal que estabiliza el flujo del Velo.",
-      "lore": "El núcleo emite un zumbido constante que alimenta las matrices defensivas de la ciudadela.",
-      "updatedAt": "2026-10-15T00:00:00.000Z"
-    }
-  ]
-}
-```
-
-#### `GET /api/v1/infrastructure/:id`
-Obtiene el detalle completo de una instalación.
+`location` y `gameplay` son opcionales.

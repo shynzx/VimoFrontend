@@ -1,13 +1,13 @@
 # VIMO — Violeta Móvil
 
-Aplicación de consulta para jugadores de **AfterLight**: cartas de mejora, personajes, enemigos y lugares del juego. Cliente React Native + Expo SDK 57. La API es el backend ASP.NET Core + SQL Server del repositorio [VimoBackend](https://github.com/GaelGrezz/VimoBackend).
+Aplicación de consulta para jugadores de **AfterLight**: cartas de mejora, personajes, enemigos, lugares, registros y manual del juego. Cliente React Native + Expo SDK 58. La API es el backend ASP.NET Core + SQL Server del repositorio [VimoBackend](https://github.com/GaelGrezz/VimoBackend).
 
-**Estado:** en desarrollo. El catálogo proviene del GDD de AfterLight y lo carga el backend con sus migraciones. El diseño sigue el Figma "Wireframes - After Light" ([estilos](docs/ESTILOS.md)).
+**Estado:** en desarrollo. El catálogo proviene del GDD de AfterLight y lo carga el backend con sus migraciones. El diseño se actualiza al [Figma AFTER LIGHT](https://www.figma.com/design/CsKcKS3qtpDfb43BoK5x95/AFTER-LIGHT). Las pantallas PC se integran como guía móvil; ver [cobertura y recorridos](docs/ACTUALIZACION_AFTERLIGHT.md).
 
 ## Requisitos
 
 - Node.js 24 y npm.
-- Expo Go o un dispositivo/emulador compatible.
+- Expo Go compatible con SDK 58 en el dispositivo o emulador.
 - El backend VimoBackend en ejecución: .NET 10 SDK y SQL Server (LocalDB basta en desarrollo).
 
 ## Instalación
@@ -55,9 +55,9 @@ Las pruebas ejecutan los servicios reales del cliente (`ServicioApi`, `ServicioC
 
 ## Organización y arquitectura
 
-Recorrido principal: **portada → Centro táctico → Base de datos de cartas** (código de cuatro dígitos con teclado numérico, por ejemplo `0013`) **→ detalle de la carta**. El **Archivo de lore** lista personajes, enemigos y lugares, y abre su perfil con enlaces a las cartas relacionadas. Ver los [recorridos de usuario](docs/RECORRIDOS_USUARIO.md).
+Recorrido principal: **portada → Centro táctico → catálogo de cartas → detalle**. El catálogo permite buscar por nombre, efecto o código y filtrar por categoría. El teclado de cuatro dígitos permanece en `/cartas/codigo`. **Lore** contiene perfiles, **Archivo** los 28 testimonios y **Manual** los 20 capítulos, 25 referencias de pantallas/estados y créditos. Ver la [actualización de recorridos](docs/ACTUALIZACION_AFTERLIGHT.md).
 
-- `src/app/`: rutas de Expo Router, en español. `index.tsx` es la portada (`/`); `(tabs)/` contiene las pestañas `/inicio`, `/cartas` (detalle en `/cartas/CAR-013`) y `/guia` (perfil en `/guia/personajes/eco-7`, `/guia/enemigos/…` o `/guia/infraestructura/…`).
+- `src/app/`: rutas de Expo Router, en español. Portada (`/`) y cinco pestañas: `/inicio`, `/cartas`, `/guia`, `/archivo` y `/manual`. Detalles en `/cartas/CAR-013`, `/guia/personajes/eco-7`, `/archivo/lucia-ferran`, `/manual/controles` y `/manual/vista/hud`.
 - `src/views/`: pantallas y presentación.
 - `src/controllers/`: coordinación de consultas del cliente.
 - `src/models/`: validación y representación de entidades (`EntradaLore` unifica la presentación del archivo de lore).
@@ -66,7 +66,7 @@ Recorrido principal: **portada → Centro táctico → Base de datos de cartas**
 
 El cliente consume el contrato en español `{ exito, datos, paginacion?, meta }` ([contrato de API](docs/API_CONTRACT.md)), descarga todas las páginas del catálogo de cartas y busca localmente por código (`0013` o `CAR-013`) o por nombre, categoría y efecto, sin distinguir mayúsculas ni acentos.
 
-La caché mantiene cuatro catálogos por servidor, caduca a los cinco minutos y conserva la última respuesta válida ante fallos de red. Las solicitudes simultáneas al mismo catálogo se deduplican. El almacenamiento está limitado a 24 entradas y 2 MiB estimados por entrada; las entradas mayores solo permanecen en memoria. Las versiones previas de la caché se ignoran mediante un prefijo versionado.
+La caché mantiene ocho catálogos por servidor, caduca a los cinco minutos y conserva la última respuesta válida ante fallos de red. Las solicitudes simultáneas al mismo catálogo se deduplican. El almacenamiento está limitado a 24 entradas y 2 MiB estimados por entrada; las entradas mayores solo permanecen en memoria. Las versiones previas de la caché se ignoran mediante un prefijo versionado.
 
 ## Publicación y versiones
 
@@ -76,7 +76,7 @@ Seguir [Git Flow y SemVer](docs/VERSIONAMIENTO.md). Consultar también el [plan]
 
 ## Documentación técnica consultada
 
-- [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/).
+- [Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/).
 - [Variables de entorno en Expo](https://docs.expo.dev/guides/environment-variables/).
 - [Navegación con Expo Router](https://docs.expo.dev/router/basics/navigation/).
 - [Fuentes en Expo](https://docs.expo.dev/develop/user-interface/fonts/).

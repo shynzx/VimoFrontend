@@ -3,6 +3,7 @@ import { ResultadoCatalogo } from '../types/catalogo';
 import { ModeloCarta } from '../models/ModeloCarta';
 import { ModeloGuia } from '../models/ModeloGuia';
 import { ServicioCache } from './ServicioCache';
+import { mapearCapitulo, mapearCredito, mapearRegistro, mapearVista } from '../models/ModeloManual';
 
 /** Envoltorio del contrato JSON: { exito, datos, paginacion?, meta? }. */
 interface Sobre {
@@ -126,4 +127,8 @@ export class ServicioApi {
   public obtenerInfraestructura(force = false): Promise<ResultadoCatalogo<Infraestructura>> {
     return this.cargar('infraestructura', (raw) => ModeloGuia.obtenerInstancia().mapearInfraestructura(raw), force);
   }
+  public obtenerManual(force = false) { return this.cargar('manual', mapearCapitulo, force); }
+  public obtenerRegistros(force = false) { return this.cargar('registros', mapearRegistro, force); }
+  public obtenerVistas(force = false) { return this.cargar('vistas', mapearVista, force); }
+  public obtenerCreditos(force = false) { return this.cargar('creditos', mapearCredito, force); }
 }

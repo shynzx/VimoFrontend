@@ -6,6 +6,7 @@ import { Layers, Zap } from 'lucide-react-native';
 import { BotonApp } from '../components/BotonApp';
 import { AvisoCatalogo } from '../components/AvisoCatalogo';
 import { Icono } from '../components/Icono';
+import { IconoCarta } from '../components/IconoCarta';
 import { EncabezadoPantalla } from '../components/EncabezadoPantalla';
 import { iconoCategoria } from '../components/iconosCatalogo';
 import { ControladorCartas } from '../controllers/ControladorCartas';
@@ -49,9 +50,9 @@ export function PantallaDetalleCarta({ id }: { id: string }) {
 
             <View style={styles.illustration} accessible={false}>
               <View style={styles.watermark}>
-                <Icono icon={iconoCategoria(card.categoria)} size={120} color={colors.border} />
+                <IconoCarta id={card.id} />
               </View>
-              <LinearGradient colors={['rgba(7, 15, 29, 0.13)', 'rgba(7, 15, 29, 0)', 'rgba(7, 15, 29, 0.9)']}
+              <LinearGradient colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.4)']}
                 locations={[0, 0.65, 1]} style={StyleSheet.absoluteFill} />
               <View style={styles.emblem}>
                 <Icono icon={iconoCategoria(card.categoria)} />

@@ -51,7 +51,7 @@ export function PantallaDetalleLore({ tipo, id }: { tipo: string; id: string }) 
               <View style={styles.watermark} accessible={false}>
                 <Icono icon={iconosLore[entry.tipo]} size={140} color={colors.border} />
               </View>
-              <LinearGradient colors={['rgba(7, 15, 29, 0)', 'rgba(7, 15, 29, 0)', 'rgba(7, 15, 29, 0.96)']}
+              <LinearGradient colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.96)']}
                 locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} />
               <View style={ui.badge}>
                 <Text style={ui.label}>{entry.insignia}</Text>

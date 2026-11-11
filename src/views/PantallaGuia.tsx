@@ -53,7 +53,7 @@ export function PantallaGuia() {
             )}
           </View>
         )}
-        ListEmptyComponent={!loading && !error ? <Text style={ui.emptyText}>No hay registros en esta sección.</Text> : null}
+        ListEmptyComponent={!loading && !error ? <Text style={ui.emptyText}>No hay registros en esta sección.</Text> : undefined}
         renderItem={({ item }) => (
           <TouchableOpacity style={ui.listItem} onPress={() => open(item)} accessibilityRole="link"
             accessibilityLabel={`${item.nombre}. ${item.subtitulo}`}>

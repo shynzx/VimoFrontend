@@ -1,5 +1,5 @@
-import { PantallaCartas } from '../../../views/PantallaCartas';
+import { PantallaCatalogoCartas } from '../../../views/PantallaCatalogoCartas';
 
 export default function RutaCartas() {
-  return <PantallaCartas />;
+  return <PantallaCatalogoCartas />;
 }

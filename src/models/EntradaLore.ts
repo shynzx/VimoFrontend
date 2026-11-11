@@ -69,7 +69,7 @@ export function entradaEnemigo(item: Enemigo): EntradaLore {
 export function entradaInfraestructura(item: Infraestructura): EntradaLore {
   return {
     id: item.id, tipo: 'infraestructura', nombre: item.nombre,
-    insignia: item.tipo, subtitulo: item.ubicacion ? `Ubicación · ${item.ubicacion}` : 'Terra', resumen: item.descripcion,
+    insignia: item.tipo, subtitulo: item.ubicacion ? `Ubicación · ${item.ubicacion}` : 'Hades', resumen: item.descripcion,
     secciones: crearSecciones(
       ['Descripción', item.descripcion],
       ['En la partida', item.funcionJugable],

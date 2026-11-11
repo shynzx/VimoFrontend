@@ -1,46 +1,39 @@
 # Estilos compartidos de VIMO
 
-El diseño sigue el Figma **"Wireframes - After Light"** (`https://www.figma.com/design/LEJTFgm8nlpR3O3u5nrZeO`), con cinco pantallas: portada, panel principal, búsqueda de cartas, detalle de carta y perfil del archivo de lore.
-
-## Estructura
-
-- `src/theme/tokens.ts`: única definición de colores, familias tipográficas, espaciado, radios, tamaños y escala de texto.
-- `src/theme/styles.ts`: estilos reutilizables creados una vez con `StyleSheet.create` (cabecera, paneles, etiquetas, secciones, acciones, pestañas y estados).
-- `src/components/BotonApp.tsx`: acción del Figma ("Action", 56 de alto) con flecha hacia adelante o de regreso, variantes `primary` y `secondary`, estados deshabilitado y de carga.
-- `src/components/EncabezadoPantalla.tsx`: botón de volver y título de la pantalla.
-- `src/components/Icono.tsx`: iconos de Lucide (`lucide-react-native`), los mismos del Figma, con trazo de 1 px.
-- `assets/images/`: imágenes descargadas del Figma (portada y holograma del panel).
+Referencia vigente: [AFTER LIGHT](https://www.figma.com/design/CsKcKS3qtpDfb43BoK5x95/AFTER-LIGHT). Las pantallas PC se adaptan como guía móvil; ver [cobertura y límites](ACTUALIZACION_AFTERLIGHT.md).
 
 ## Sistema visual
 
 | Token | Valor | Uso |
 | --- | --- | --- |
-| `colors.background` | `#070F1D` | Fondo de las pantallas |
-| `colors.surface` / `surfaceRaised` | `#0E1C2E` / `#14263B` | Paneles, barra de pestañas, teclas |
-| `colors.primary` | `#FF4659` | Acento, acciones, etiquetas y bordes destacados |
-| `colors.primarySoft` | `#351B2A` | Fondos destacados (estadísticas, cartas) |
-| `colors.text` / `textSecondary` | `#F1F6FC` / `#9AACBF` | Texto principal y secundario |
-| `colors.border` | `#263D54` | Separadores y bordes neutros |
+| background | #000000 | Fondo |
+| surface / surfaceRaised | #0B0B0B / #1A1A1A | Paneles y controles |
+| primary | #FF5964 | Acentos y avisos |
+| selected / institutional | #FFD9DC / #B52D3A | Selección e identidad |
+| text / textSecondary | #ECEAE4 / #C9C9C9 | Texto |
+| muted / border | #8A8A8A / #343331 | Metadatos y separadores |
 
-Tipografías (cargadas con `@expo-google-fonts` en `src/app/_layout.tsx`): **Rajdhani** para títulos y botones en mayúsculas, **IBM Plex Mono** para etiquetas y códigos, **Inter** para el texto.
+Kelly Slab para títulos, nombres y códigos; Inter para cuerpo, etiquetas y acciones. Radios de 3 unidades. Los identificadores de fuente `mono` y `monoRegular` se conservan por compatibilidad interna y ahora resuelven a Inter.
 
-## Reglas para ampliar la interfaz
+## Archivos y componentes
 
-1. Utilizar nombres semánticos (`colors.primary`, `colors.textSecondary`); mantener los colores literales dentro de `tokens.ts`.
-2. Reutilizar `ui.title`, `ui.display`, `ui.heading`, `ui.label`, `ui.body`, `ui.copy` y `ui.caption` para mantener la jerarquía del Figma.
-3. Usar `BotonApp` para acciones y `EncabezadoPantalla` para la cabecera. Reservar `TouchableOpacity` para tarjetas enlazadas, pestañas y teclas.
-4. Los controles interactivos tienen un área táctil mínima de 48 unidades (el botón de volver de 36 usa `hitSlop`). Usar altura mínima en lugar de alturas fijas en contenedores con texto.
-5. Las pantallas comparten un ancho máximo de 720 unidades.
-6. Crear los estilos específicos fuera del render con `StyleSheet.create` y componerlos con los compartidos. Con `Link asChild`, pasar un estilo plano: Expo Router no acepta arreglos.
-7. Componer estados mediante arreglos, por ejemplo `[ui.tab, selected && ui.activeTab]`.
-8. Mantener el escalado de texto del sistema y las etiquetas de accesibilidad. Los avisos no dependen únicamente del color.
+- `src/theme/tokens.ts`: única definición de colores, tipografía, espaciado, radios y tamaños.
+- `src/theme/styles.ts`: superficies, textos, botones, pestañas y estados compartidos.
+- `BotonApp`, `EncabezadoPantalla`, `EstadoConsulta` y `AvisoCatalogo`: acciones, navegación y estados de carga/error/caché.
+- `IconoCarta`: 21 SVG originales de Figma en `assets/figma/cartas`, identificados por CAR-001 a CAR-021. Mantener las dimensiones de raíz de 96 × 96.
+- `DecoracionCreditos`: partículas de 3 × 3 y marcas de 90 × 8 descargadas de Figma.
+- `TextoManual`: títulos, párrafos, listas, citas y tablas nativas con desplazamiento horizontal.
 
-## Diferencias con el Figma
+## Reglas de implementación
 
-Los textos del Figma (General Reed, "Mejora de disparo rápido", "Poder táctico 85/100") son de ejemplo. La app muestra el catálogo real del GDD, que no incluye ilustraciones de cartas, retratos, duración ni poder táctico. Por eso:
+1. Usar tokens semánticos y componer los estilos compartidos.
+2. Usar `StyleSheet.create` fuera del render para los estilos de cada pantalla.
+3. Mantener áreas táctiles de al menos 48 unidades; usar `hitSlop` para controles visualmente más pequeños.
+4. Permitir el escalado del texto; evitar alturas fijas donde el contenido puede crecer.
+5. Respetar el ancho máximo compartido de 720 unidades y probar a 390 × 844.
+6. Con `Link asChild`, utilizar un estilo plano.
+7. No sustituir los iconos de cartas por iconos de categoría ni alterar los SVG descargados.
+8. No usar URLs temporales de Figma en tiempo de ejecución.
+9. Distinguir las cifras ilustrativas del diseño de los datos reales de la API; VIMO no tiene conexión con la partida.
 
-- El recuadro de ilustración de la carta muestra el emblema de su categoría, y las estadísticas, el efecto por nivel y el nivel máximo.
-- El retrato del perfil muestra un icono del tipo de registro y se omite el medidor de poder.
-- El panel principal omite el nombre del jugador y el estado de partida, porque la app no está conectada a la partida.
-- La búsqueda omite el botón de cámara hasta que se implemente el escaneo.
-- La lista del Archivo de lore, sin pantalla en el Figma, usa el mismo sistema visual.
+La portada y algunos perfiles conservan recursos del diseño anterior. No existe un equivalente móvil definido para ellos en el nuevo archivo. Las pantallas del juego se consultan como documentación; no se incorporan botones de pausa, volumen o reinicio que aparenten controlar una partida.

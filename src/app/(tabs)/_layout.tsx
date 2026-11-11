@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import type { LucideIcon } from 'lucide-react-native';
-import { BookOpen, House, Layers } from 'lucide-react-native';
+import { BookOpen, House, Layers, Archive, Compass } from 'lucide-react-native';
 import { StyleSheet } from 'react-native';
 import type { ColorValue } from 'react-native';
 import { Icono } from '../../components/Icono';
@@ -27,6 +27,8 @@ export default function DisenoPestanas() {
       <Tabs.Screen name="inicio" options={{ title: 'Inicio', tabBarIcon: iconoPestana(House) }} />
       <Tabs.Screen name="cartas" options={{ title: 'Cartas', tabBarIcon: iconoPestana(Layers) }} />
       <Tabs.Screen name="guia" options={{ title: 'Lore', tabBarIcon: iconoPestana(BookOpen) }} />
+      <Tabs.Screen name="archivo" options={{ title: 'Archivo', tabBarIcon: iconoPestana(Archive) }} />
+      <Tabs.Screen name="manual" options={{ title: 'Manual', tabBarIcon: iconoPestana(Compass) }} />
     </Tabs>
   );
 }

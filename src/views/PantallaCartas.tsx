@@ -54,7 +54,7 @@ export function PantallaCartas() {
 
   return (
     <SafeAreaView style={ui.screen} edges={['top', 'left', 'right']}>
-      <EncabezadoPantalla title="Base de datos de cartas" fallback="/inicio" />
+      <EncabezadoPantalla title="Consulta por código" fallback="/cartas" />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.instructions}>
           <Text style={ui.label}>Consulta rápida / ID de carta</Text>

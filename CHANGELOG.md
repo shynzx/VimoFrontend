@@ -2,6 +2,11 @@
 
 ## Sin publicar
 
+- Guía móvil del nuevo Figma AFTER LIGHT: paleta negra, Kelly Slab e Inter, catálogo visual con los 21 SVG originales, filtros por categoría y búsqueda; se conserva el teclado en `/cartas/codigo`.
+- Archivo con 28 registros narrativos completos, búsqueda por autor/sector/contenido y filtro de registros vinculados a Issac.
+- Manual con 20 capítulos del GDD, 25 referencias de pantallas/estados y créditos, conectado a la API y a la caché persistente.
+- Actualización del contexto a Eco-10 y Hades; pruebas de los nuevos contratos y recuperación sin conexión.
+
 - Propiedades de los modelos y de las clases en español (`carta.nombre`, `carta.codigoJuego`, `resultado.datos`, `entrada.secciones`…), renombradas con el servicio de lenguaje de TypeScript. La caché pasa a `@vimo_cache:v5:`.
 - Rutas de la app en español: `/inicio`, `/cartas`, `/cartas/[id]`, `/guia` y `/guia/[tipo]/[id]` con `tipo` = `personajes`, `enemigos` o `infraestructura`.
 - Contrato de API en español: rutas `/api/v1/cartas`, `/personajes`, `/enemigos`, `/infraestructura`; parámetros `busqueda`, `categoria`, `pagina` y `limite`; envoltorio `{ exito, datos, paginacion?, meta }` y campos como `nombre`, `codigoJuego` o `nivelMaximo`. Los modelos de la app conservan sus propiedades en inglés.

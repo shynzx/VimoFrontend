@@ -1,7 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowUpRight, Zap } from 'lucide-react-native';
+import { ArrowUpRight, Zap, Archive, Compass } from 'lucide-react-native';
 import { Icono } from '../components/Icono';
 import { ui } from '../theme/styles';
 import { colors, radius, spacing, typography } from '../theme/tokens';
@@ -16,7 +16,8 @@ export function PantallaInicio() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.heading}>
           <Text style={ui.title} accessibilityRole="header">Centro táctico</Text>
-          <Text style={ui.description}>Consulta lo que necesitas. El combate sigue en tu PC o consola.</Text>
+          <Text style={ui.label}>Hades / Operación Umbral</Text>
+          <Text style={ui.description}>Inteligencia para Eco-10. Consulta la guía mientras juegas en tu PC.</Text>
         </View>
 
         <Link href="/cartas" asChild>
@@ -42,15 +43,28 @@ export function PantallaInicio() {
 
         <Link href="/guia" asChild>
           <TouchableOpacity style={styles.entry} accessibilityRole="link"
-            accessibilityLabel="Archivo de lore. Personajes, enemigos y lugares de Terra.">
+            accessibilityLabel="Archivo de lore. Personajes, enemigos y lugares de Hades.">
             <View style={ui.spaceBetween}>
               <Image source={helmet} style={styles.hologram} accessible={false} />
-              <Metadatos label="Universo Terra" />
+              <Metadatos label="Universo Hades" />
             </View>
             <View style={styles.copy}>
               <Text style={styles.entryTitle}>Archivo de lore</Text>
-              <Text style={ui.caption}>Personajes, enemigos y lugares de Terra.</Text>
+              <Text style={ui.caption}>Personajes, enemigos y lugares de Hades.</Text>
             </View>
+          </TouchableOpacity>
+        </Link>
+
+        <Link href="/archivo" asChild>
+          <TouchableOpacity style={styles.entry} accessibilityRole="link" accessibilityLabel="Archivo del jugador. Consultar registros narrativos.">
+            <View style={ui.spaceBetween}><Icono icon={Archive} size={48} /><Metadatos label="Registros de campo" /></View>
+            <View style={styles.copy}><Text style={styles.entryTitle}>Archivo del jugador</Text><Text style={ui.caption}>Testimonios, ubicaciones y la conexión con Issac.</Text></View>
+          </TouchableOpacity>
+        </Link>
+        <Link href="/manual" asChild>
+          <TouchableOpacity style={styles.entry} accessibilityRole="link" accessibilityLabel="Manual del jugador. Mecánicas, controles y pantallas.">
+            <View style={ui.spaceBetween}><Icono icon={Compass} size={48} /><Metadatos label="Guía de supervivencia" /></View>
+            <View style={styles.copy}><Text style={styles.entryTitle}>Manual del jugador</Text><Text style={ui.caption}>Controles, batería, generadores, misiones y estados del HUD.</Text></View>
           </TouchableOpacity>
         </Link>
       </ScrollView>

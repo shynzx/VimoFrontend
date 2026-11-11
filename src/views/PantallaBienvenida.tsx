@@ -14,7 +14,7 @@ export function PantallaBienvenida() {
     <View style={styles.container}>
       <Image source={soldier} style={StyleSheet.absoluteFill} resizeMode="cover" accessible={false} />
       <LinearGradient
-        colors={['rgba(7, 15, 29, 0.533)', 'rgba(7, 15, 29, 0)', 'rgba(7, 15, 29, 0.667)', colors.background, colors.background]}
+        colors={['rgba(0, 0, 0, 0.533)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.667)', colors.background, colors.background]}
         locations={[0, 0.4, 0.62, 0.83, 1]}
         style={StyleSheet.absoluteFill}
       />
@@ -29,8 +29,8 @@ export function PantallaBienvenida() {
           <Text style={ui.hero} accessibilityRole="header">
             AFTER{'\n'}<Text style={styles.light}>LIGHT</Text>
           </Text>
-          <Text style={styles.copy}>Tu enlace al frente de batalla. Cartas, personajes e historia en un solo lugar.</Text>
-          <BotonApp title="Get started" style={styles.action} onPress={() => router.replace('/inicio')} />
+          <Text style={styles.copy}>Tu guía de la Operación Umbral. Cartas, controles, registros e historia de Hades.</Text>
+          <BotonApp title="Abrir la guía" style={styles.action} onPress={() => router.replace('/inicio')} />
         </View>
       </SafeAreaView>
     </View>
@@ -40,7 +40,7 @@ export function PantallaBienvenida() {
 const styles = StyleSheet.create({
   // overflow evita que la imagen amplíe el área visible en la versión web.
   container: { flex: 1, backgroundColor: colors.background, overflow: 'hidden' },
-  tint: { backgroundColor: 'rgba(255, 70, 89, 0.12)' },
+  tint: { backgroundColor: 'rgba(255, 89, 100, 0.12)' },
   content: { flex: 1, justifyContent: 'space-between', paddingHorizontal: 28, paddingTop: spacing.lg, paddingBottom: spacing.lg },
   accent: { width: 20, height: 2, backgroundColor: colors.primary },
   introduction: { gap: 18 },

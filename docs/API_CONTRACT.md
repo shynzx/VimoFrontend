@@ -170,3 +170,7 @@ La app solo lee. La API también permite crear, editar y eliminar registros para
 ## Correspondencia con el código
 
 Los nombres del JSON coinciden con las propiedades de los modelos, en español en ambos proyectos: en C# los DTO (`Dtos/DtosCatalogo.cs`) se serializan en camelCase, y en la app `ModeloCarta` y `ModeloGuia` (`src/models/`) validan cada registro. Las clases, los métodos y las propiedades están en español.
+
+## Manual y Archivo del jugador
+
+Se añaden GET /api/v1/manual (20 capítulos), /registros (28 testimonios), /vistas (25 pantallas/estados) y /creditos. Los tres primeros admiten /{id}, con error NO_ENCONTRADO si no existe. Listados completos sin paginación; mismo envoltorio y meta.demo. Ver [contenido, campos y mantenimiento](ACTUALIZACION_AFTERLIGHT.md).
